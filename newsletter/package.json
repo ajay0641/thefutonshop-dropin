@@ -1,14 +1,11 @@
 {
-  "private": true,
-  "name": "@dropins/tfs-newsletter",
-  "version": "1.0.0",
+  "name": "@ajay0641/tfs-newsletter",
+  "version": "1.0.2",
+  "description": "The Futon Shop newsletter subscription drop-in for Adobe Commerce storefronts",
   "license": "MIT",
   "engines": {
     "node": "^20.0.0 || ^22.0.0"
   },
-  "files": [
-    "*"
-  ],
   "sideEffects": false,
   "scripts": {
     "dev": "concurrently 'npm run storybook' 'npm run serve'",
@@ -19,7 +16,10 @@
     "build": "elsie build",
     "analyze": "ANALYZE=true elsie build",
     "changeset": "changeset",
-    "version": "changeset version"
+    "version": "changeset version",
+    "prepare:publish": "npm run build && node scripts/prepare-publish.js",
+    "pack:dropin": "npm run prepare:publish && npm pack --pack-destination . .publish",
+    "publish:dropin": "npm run prepare:publish && npm publish .publish --access public"
   },
   "dependencies": {
     "@adobe-commerce/elsie": "~1.6.0",

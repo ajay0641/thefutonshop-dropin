@@ -1,0 +1,25 @@
+# Source / tooling (never ship to storefront consumers)
+src
+tests
+examples
+coverage
+node_modules
+.storybook
+.elsie.js
+.env
+.env.*
+.env.sample
+.eslintrc.js
+.prettier*
+prettier.config.js
+jest.config.js
+tsconfig.json
+storybook-stories.js
+package-lock.json
+*.log
+.publish
+scripts
+
+# Keep secrets out of any accidental root pack
+*.pem
+*.key
