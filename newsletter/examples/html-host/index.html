@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>Newsletter Drop-in Sandbox</title>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js"
+    ></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@dropins/tools/": "https://cdn.jsdelivr.net/npm/@dropins/tools/",
+          "my-pkg/": "http://localhost:3002/"
+        }
+      }
+    </script>
+
+    <style>
+      /* Base Design System Tokens */
+      /* .dropin-design { } */
+    </style>
+  </head>
+
+  <body>
+    <script type="module">
+      import * as pkg from 'my-pkg/api.js';
+      import { events } from '@dropins/tools/event-bus.js';
+      import { initializers } from '@dropins/tools/initializer.js';
+      import { render as provider } from 'my-pkg/render.js';
+      import NewsletterContainer from 'my-pkg/containers/NewsletterContainer.js';
+
+      // GraphQL endpoint (from drop-in .env ENDPOINT for local sandbox testing)
+      const ENDPOINT =
+        'https://na1-sandbox.api.commerce.adobe.com/4XR4RKXgJjQXaxUCMC6TN3/graphql';
+
+      pkg.setEndpoint(ENDPOINT);
+
+      // Magento store headers (also set by initialize defaults)
+      pkg.setFetchGraphQlHeaders({
+        'Magento-Store-View-Code': 'default',
+        'Magento-Website-Code': 'base',
+      });
+
+      initializers.register(pkg.initialize, {
+        storeViewCode: 'default',
+        websiteCode: 'base',
+      });
+      initializers.mount();
+
+      const $data = document.getElementById('data');
+      const $action_1 = document.getElementById('action-1');
+
+      events.on('newsletter/subscribed', (payload) => {
+        $data.innerText = JSON.stringify(
+          { event: 'newsletter/subscribed', payload },
+          null,
+          2
+        );
+      });
+
+      events.on('newsletter/error', (payload) => {
+        $data.innerText = JSON.stringify(
+          { event: 'newsletter/error', payload },
+          null,
+          2
+        );
+      });
+
+      // Manual API test button
+      $action_1.addEventListener('click', async () => {
+        $data.innerText = '⏳ Subscribing…';
+        try {
+          const result = await pkg.subscribeToNewsletter('test1@test1.com');
+          $data.innerText = JSON.stringify(
+            { api: 'subscribeToNewsletter', result },
+            null,
+            2
+          );
+        } catch (error) {
+          $data.innerText = JSON.stringify(
+            {
+              api: 'subscribeToNewsletter',
+              error: error?.message ?? String(error),
+            },
+            null,
+            2
+          );
+        }
+      });
+
+      // Render newsletter container
+      provider.render(NewsletterContainer, {
+        onSuccess: (payload) => {
+          console.log('Newsletter success', payload);
+        },
+        onError: (payload) => {
+          console.error('Newsletter error', payload);
+        },
+      })(document.getElementById('my-container'));
+
+      $data.innerText = 'Ready — use the form or Action button.';
+    </script>
+
+    <div id="app">
+      <h1 id="title">Newsletter Drop-in</h1>
+
+      <div class="cards">
+        <div class="card card--black">
+          <h2 class="heading">App Shell</h2>
+
+          <fieldset class="actions">
+            <legend>API Functions</legend>
+            <button id="action-1">Subscribe test1@test1.com</button>
+          </fieldset>
+
+          <code data-label="subscribeToNewsletter">
+            <pre id="data">⏳ Loading...</pre>
+          </code>
+        </div>
+
+        <div class="containers">
+          <h2 class="heading">Newsletter Container</h2>
+          <div id="my-container" class="container"></div>
+        </div>
+      </div>
+    </div>
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="example.css" />
+  </body>
+</html>
