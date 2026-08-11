@@ -1,0 +1,134 @@
+/********************************************************************
+ *  Copyright 2025 Adobe
+ *  All Rights Reserved.
+ *
+ * NOTICE:  Adobe permits you to use, copy, and distribute this
+ * file in accordance with the terms of the Adobe license agreement
+ * accompanying it.
+ *******************************************************************/
+
+/* https://cssguidelin.es/#bem-like-naming */
+
+.tfsproductslider-product-slider-component {
+  --tfs-slider-gap: 1.25rem;
+  --tfs-slider-accent: #6b2c28;
+  --tfs-slider-text: #1a1a1a;
+  --tfs-slider-font: Georgia, 'Times New Roman', Times, serif;
+
+  width: 100%;
+  color: var(--tfs-slider-text);
+  font-family: var(--tfs-slider-font);
+  box-sizing: border-box;
+}
+
+.tfsproductslider-product-slider-component__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tfsproductslider-product-slider-component__title {
+  margin: 0;
+  font: 700 1.5rem/1.25 var(--tfs-slider-font);
+}
+
+.tfsproductslider-product-slider-component__nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.tfsproductslider-product-slider-component__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid #cfc8bc;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--tfs-slider-text);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.tfsproductslider-product-slider-component__nav-btn:hover {
+  border-color: var(--tfs-slider-accent);
+  color: var(--tfs-slider-accent);
+}
+
+.tfsproductslider-product-slider-component__nav-btn:focus-visible {
+  outline: 2px solid var(--tfs-slider-accent);
+  outline-offset: 2px;
+}
+
+.tfsproductslider-product-slider-component__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - var(--tfs-slider-gap)) / 2);
+  gap: var(--tfs-slider-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 0.35rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tfsproductslider-product-slider-component__track::-webkit-scrollbar {
+  display: none;
+}
+
+.tfsproductslider-product-slider-component__slide {
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+.tfsproductslider-product-slider-component__skeleton {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #f0ebe3 25%, #f8f5f0 50%, #f0ebe3 75%);
+  background-size: 200% 100%;
+  animation: tfsproductslider-skeleton 1.2s ease-in-out infinite;
+}
+
+.tfsproductslider-product-slider-component__status {
+  margin: 0;
+  font: 400 1rem/1.4 var(--tfs-slider-font);
+}
+
+.tfsproductslider-product-slider-component__status--error {
+  color: #a11;
+}
+
+@keyframes tfsproductslider-skeleton {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Mobile: 1 item */
+@media only screen and (max-width: 639px) {
+  .tfsproductslider-product-slider-component__track {
+    grid-auto-columns: 100%;
+  }
+}
+
+/* Tablet / desktop: 4 items */
+@media only screen and (min-width: 1024px) {
+  .tfsproductslider-product-slider-component__track {
+    grid-auto-columns: calc((100% - (var(--tfs-slider-gap) * 3)) / 4);
+  }
+
+  .tfsproductslider-product-slider-component__title {
+    font-size: 1.75rem;
+  }
+}

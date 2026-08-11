@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>Product Slider Drop-in Sandbox</title>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js"
+    ></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@dropins/tools/": "https://cdn.jsdelivr.net/npm/@dropins/tools/",
+          "my-pkg/": "http://localhost:3002/"
+        }
+      }
+    </script>
+
+    <style>
+      #my-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script type="module">
+      import * as pkg from 'my-pkg/api.js';
+      import { events } from '@dropins/tools/event-bus.js';
+      import { initializers } from '@dropins/tools/initializer.js';
+      import { render as provider } from 'my-pkg/render.js';
+      import ProductSliderContainer from 'my-pkg/containers/ProductSliderContainer.js';
+
+      const ENDPOINT =
+        'https://na1-sandbox.api.commerce.adobe.com/4XR4RKXgJjQXaxUCMC6TN3/graphql';
+
+      pkg.setEndpoint(ENDPOINT);
+
+      pkg.setFetchGraphQlHeaders({
+        'Magento-Store-View-Code': 'default',
+        'Magento-Website-Code': 'base',
+        'Magento-Store-Code': 'main_website_store',
+      });
+
+      initializers.register(pkg.initialize, {
+        storeViewCode: 'default',
+        websiteCode: 'base',
+        storeCode: 'main_website_store',
+      });
+      initializers.mount();
+
+      const $data = document.getElementById('data');
+      const $action_1 = document.getElementById('action-1');
+
+      events.on('product-slider/data', (payload) => {
+        $data.innerText = JSON.stringify(
+          { event: 'product-slider/data', payload },
+          null,
+          2
+        );
+      });
+
+      events.on('product-slider/error', (payload) => {
+        $data.innerText = JSON.stringify(
+          { event: 'product-slider/error', payload },
+          null,
+          2
+        );
+      });
+
+      events.on('product-slider/product-click', (payload) => {
+        $data.innerText = JSON.stringify(
+          { event: 'product-slider/product-click', payload },
+          null,
+          2
+        );
+      });
+
+      $action_1.addEventListener('click', async () => {
+        $data.innerText = '⏳ Fetching products…';
+        try {
+          const result = await pkg.getProductSlider({
+            phrase: '',
+            pageSize: 8,
+            currentPage: 1,
+            filter: [{ attribute: 'isNew', eq: '1' }],
+          });
+          $data.innerText = JSON.stringify(
+            { api: 'getProductSlider', result },
+            null,
+            2
+          );
+        } catch (error) {
+          $data.innerText = JSON.stringify(
+            {
+              api: 'getProductSlider',
+              error: error?.message ?? String(error),
+            },
+            null,
+            2
+          );
+        }
+      });
+
+      provider.render(ProductSliderContainer, {
+        title: 'New Arrivals',
+        pageSize: 8,
+        filter: [{ attribute: 'isNew', eq: '1' }],
+        onLoad: (result) => {
+          console.log('Product slider loaded', result);
+        },
+        onError: (payload) => {
+          console.error('Product slider error', payload);
+        },
+      })(document.getElementById('my-container'));
+
+      $data.innerText = 'Ready — container loads products automatically.';
+    </script>
+
+    <div id="app">
+      <h1 id="title">Product Slider Drop-in</h1>
+
+      <div class="cards">
+        <div class="card card--black">
+          <h2 class="heading">App Shell</h2>
+
+          <fieldset class="actions">
+            <legend>API Functions</legend>
+            <button id="action-1">getProductSlider()</button>
+          </fieldset>
+
+          <code data-label="getProductSlider">
+            <pre id="data">⏳ Loading...</pre>
+          </code>
+        </div>
+
+        <div class="containers">
+          <h2 class="heading">Product Slider Container</h2>
+          <div id="my-container" class="container"></div>
+        </div>
+      </div>
+    </div>
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="example.css" />
+  </body>
+</html>

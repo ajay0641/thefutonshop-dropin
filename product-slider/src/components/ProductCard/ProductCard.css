@@ -1,0 +1,155 @@
+/********************************************************************
+ *  Copyright 2025 Adobe
+ *  All Rights Reserved.
+ *
+ * NOTICE:  Adobe permits you to use, copy, and distribute this
+ * file in accordance with the terms of the Adobe license agreement
+ * accompanying it.
+ *******************************************************************/
+
+.tfsproductslider-product-card {
+  --tfs-card-text: #1a1a1a;
+  --tfs-card-sale: #6b2c28;
+  --tfs-card-star: #c8a24a;
+  --tfs-card-font: Georgia, 'Times New Roman', Times, serif;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+  color: var(--tfs-card-text);
+  font-family: var(--tfs-card-font);
+  box-sizing: border-box;
+}
+
+.tfsproductslider-product-card__media-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tfsproductslider-product-card__media-link:focus-visible {
+  outline: 2px solid var(--tfs-card-sale);
+  outline-offset: 4px;
+}
+
+.tfsproductslider-product-card__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f3f1ed;
+}
+
+.tfsproductslider-product-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tfsproductslider-product-card__image--placeholder {
+  background: linear-gradient(135deg, #ece9e3 0%, #f7f5f1 100%);
+}
+
+.tfsproductslider-product-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.tfsproductslider-product-card__title {
+  margin: 0;
+  font: 700 1.05rem/1.3 var(--tfs-card-font);
+  color: var(--tfs-card-text);
+}
+
+.tfsproductslider-product-card__title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.tfsproductslider-product-card__title-link:hover,
+.tfsproductslider-product-card__title-link:focus-visible {
+  text-decoration: underline;
+}
+
+.tfsproductslider-product-card__title-link:focus-visible {
+  outline: 2px solid var(--tfs-card-sale);
+  outline-offset: 2px;
+}
+
+.tfsproductslider-product-card__subtitle {
+  margin: 0;
+  font: 700 1.05rem/1.3 var(--tfs-card-font);
+  color: var(--tfs-card-text);
+}
+
+.tfsproductslider-product-card__reviews {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.tfsproductslider-product-card__stars {
+  display: inline-flex;
+  gap: 0.05rem;
+  letter-spacing: 0.02em;
+}
+
+.tfsproductslider-product-card__star {
+  color: #d9d2c5;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.tfsproductslider-product-card__star--filled {
+  color: var(--tfs-card-star);
+}
+
+.tfsproductslider-product-card__review-count {
+  font: 400 0.9rem/1.2 var(--tfs-card-font);
+  color: var(--tfs-card-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tfsproductslider-product-card__pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.15rem;
+}
+
+.tfsproductslider-product-card__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.5rem;
+}
+
+.tfsproductslider-product-card__from {
+  font: 700 1rem/1.2 var(--tfs-card-font);
+  color: var(--tfs-card-text);
+}
+
+.tfsproductslider-product-card__regular {
+  font: 700 1rem/1.2 var(--tfs-card-font);
+  color: var(--tfs-card-text);
+  text-decoration: line-through;
+}
+
+.tfsproductslider-product-card__final {
+  font: 700 1.05rem/1.2 var(--tfs-card-font);
+  color: var(--tfs-card-sale);
+}
+
+.tfsproductslider-product-card__save {
+  margin: 0;
+  font: 700 1rem/1.25 var(--tfs-card-font);
+  color: var(--tfs-card-sale);
+}
