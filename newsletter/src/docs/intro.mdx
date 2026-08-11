@@ -1,0 +1,45 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Getting Started" />
+
+# TFS Newsletter Drop-in
+
+Subscribe shoppers to the Magento/Adobe Commerce newsletter.
+
+## Features
+
+- **API** — `subscribeToNewsletter(email)` GraphQL mutation
+- **Container** — `NewsletterContainer` form with validation, loading, and alerts
+- **Events** — `newsletter/subscribed`, `newsletter/error`
+- **Headers** — `Magento-Store-View-Code`, `Magento-Website-Code`
+
+## Quick start (storefront)
+
+```js
+import { initialize, setEndpoint, subscribeToNewsletter } from 'my-pkg/api.js';
+import { render as provider } from 'my-pkg/render.js';
+import NewsletterContainer from 'my-pkg/containers/NewsletterContainer.js';
+import { initializers } from '@dropins/tools/initializer.js';
+
+setEndpoint('https://your-endpoint/graphql');
+
+initializers.register(initialize, {
+  storeViewCode: 'default',
+  websiteCode: 'base',
+});
+initializers.mount();
+
+provider.render(NewsletterContainer, {
+  onSuccess: ({ email, status }) => console.log(email, status),
+})(document.getElementById('newsletter'));
+```
+
+## Mutation
+
+```graphql
+mutation SubscribeToNewsletter($email: String!) {
+  subscribeEmailToNewsletter(email: $email) {
+    status
+  }
+}
+```

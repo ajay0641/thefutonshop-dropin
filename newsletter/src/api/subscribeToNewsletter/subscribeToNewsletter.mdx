@@ -1,0 +1,35 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="API/subscribeToNewsletter" />
+
+# subscribeToNewsletter
+
+Subscribe an email address to the Commerce newsletter via GraphQL.
+
+```ts
+import { subscribeToNewsletter } from '@/tfsnewsletterdropin/api/subscribeToNewsletter';
+```
+
+## Mutation
+
+```graphql
+mutation SubscribeToNewsletter($email: String!) {
+  subscribeEmailToNewsletter(email: $email) {
+    status
+  }
+}
+```
+
+## Usage
+
+```ts
+const result = await subscribeToNewsletter('test1@test1.com');
+// { status: 'SUBSCRIBED' | 'NOT_ACTIVE' | 'UNSUBSCRIBED' | 'UNCONFIRMED' }
+```
+
+## Headers
+
+Ensure store headers are set (via `initialize` or manually):
+
+- `Magento-Store-View-Code: default`
+- `Magento-Website-Code: base`
