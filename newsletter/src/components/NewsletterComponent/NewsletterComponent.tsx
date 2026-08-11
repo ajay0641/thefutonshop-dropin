@@ -2,7 +2,7 @@
  *  Copyright 2025 Adobe
  *  All Rights Reserved.
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this
+ * NOTICE:  Adobe permits you to use, copy, and distribute this
  * file in accordance with the terms of the Adobe license agreement
  * accompanying it.
  *******************************************************************/
@@ -20,6 +20,7 @@ export interface NewsletterComponentProps extends HTMLAttributes<HTMLDivElement>
   email?: string;
   loading?: boolean;
   emailError?: string | null;
+  successMessage?: string | null;
   onEmailChange?: (email: string) => void;
   onSubmit?: (email: string) => void;
 }
@@ -32,15 +33,27 @@ export const NewsletterComponent: FunctionComponent<NewsletterComponentProps> = 
   email = '',
   loading = false,
   emailError = null,
+  successMessage = null,
   onEmailChange,
   onSubmit,
   ...props
 }) => {
+  // Elsie Input debounces onValue (200ms). Use onChange for immediate parent updates
+  // so validation errors clear as the user types and submit sees the current value.
+  const handleInputChange = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    onEmailChange?.(value);
+  };
+
   const handleSubmit = (event: Event) => {
     event.preventDefault();
-    if (!loading) {
-      onSubmit?.(email);
-    }
+    if (loading) return;
+
+    const form = event.target as HTMLFormElement;
+    // Prefer live form value so validation/error state stays in sync with typed text
+    const formEmail = String(new FormData(form).get('email') || '');
+
+    onSubmit?.(formEmail);
   };
 
   return (
@@ -61,10 +74,17 @@ export const NewsletterComponent: FunctionComponent<NewsletterComponentProps> = 
             placeholder={emailPlaceholder}
             aria-label={emailPlaceholder}
             aria-invalid={!!emailError}
-            aria-describedby={emailError ? 'newsletter-email-error' : undefined}
+            aria-describedby={
+              emailError
+                ? 'newsletter-email-error'
+                : successMessage
+                  ? 'newsletter-success-message'
+                  : undefined
+            }
             disabled={loading}
             error={!!emailError}
-            onValue={(value) => onEmailChange?.(String(value))}
+            success={!!successMessage && !emailError}
+            onChange={handleInputChange}
             autoComplete="email"
             required
             className="tfsnewsletterdropin-newsletter-component__input"
@@ -77,6 +97,16 @@ export const NewsletterComponent: FunctionComponent<NewsletterComponentProps> = 
               role="alert"
             >
               {emailError}
+            </p>
+          )}
+
+          {!emailError && successMessage && (
+            <p
+              id="newsletter-success-message"
+              className="tfsnewsletterdropin-newsletter-component__success"
+              role="status"
+            >
+              {successMessage}
             </p>
           )}
         </div>

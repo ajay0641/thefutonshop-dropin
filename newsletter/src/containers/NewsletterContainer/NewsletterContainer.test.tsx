@@ -2,7 +2,7 @@
  *  Copyright 2025 Adobe
  *  All Rights Reserved.
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this
+ * NOTICE:  Adobe permits you to use, copy, and distribute this
  * file in accordance with the terms of the Adobe license agreement
  * accompanying it.
  *******************************************************************/
@@ -38,7 +38,7 @@ const getEmailInput = (container: HTMLElement) =>
 const typeEmail = async (input: HTMLInputElement, value: string) => {
   fireEvent.change(input, { target: { value } });
   await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await Promise.resolve();
   });
 };
 
@@ -88,6 +88,7 @@ describe('TfsNewsletterDropin/Containers/NewsletterContainer', () => {
       submittingLabel: '',
       invalidEmail: '',
       requiredEmail: '',
+      successMessage: '',
     });
 
     const { container, findByRole, getByRole } = render(<NewsletterContainer />);
@@ -117,12 +118,12 @@ describe('TfsNewsletterDropin/Containers/NewsletterContainer', () => {
     expect(queryByRole('alert')).toBeNull();
   });
 
-  test('subscribes successfully and emits event', async () => {
+  test('subscribes successfully, shows success message, and emits event', async () => {
     mockSubscribe.mockResolvedValue({ status: 'SUBSCRIBED' });
     const onSuccess = jest.fn();
     const emitSpy = jest.spyOn(events, 'emit');
 
-    const { container, getByRole } = render(
+    const { container, findByRole, getByRole } = render(
       <NewsletterContainer onSuccess={onSuccess} />
     );
     const input = getEmailInput(container);
@@ -147,6 +148,40 @@ describe('TfsNewsletterDropin/Containers/NewsletterContainer', () => {
     });
     expect(getEmailInput(container).value).toBe('');
     expect(getByRole('button').textContent).toContain('Subscribe');
+
+    const status = await findByRole('status');
+    expect(status.textContent).toContain('Thank you for your subscription.');
+  });
+
+  test('uses fallback success message when translation is empty', async () => {
+    mockUseText.mockReturnValue({
+      emailPlaceholder: 'Email',
+      submitLabel: 'Subscribe',
+      submittingLabel: '…',
+      invalidEmail: 'Invalid',
+      requiredEmail: 'Required',
+      successMessage: '',
+    });
+    mockSubscribe.mockResolvedValue({ status: 'SUBSCRIBED' });
+
+    const { container, findByRole } = render(<NewsletterContainer />);
+    await typeEmail(getEmailInput(container), 'test1@test1.com');
+    submitForm(container);
+
+    const status = await findByRole('status');
+    expect(status.textContent).toContain('Thank you for your subscription.');
+  });
+
+  test('clears success message when email changes', async () => {
+    mockSubscribe.mockResolvedValue({ status: 'SUBSCRIBED' });
+    const { container, findByRole, queryByRole } = render(<NewsletterContainer />);
+
+    await typeEmail(getEmailInput(container), 'test1@test1.com');
+    submitForm(container);
+    expect(await findByRole('status')).toBeTruthy();
+
+    await typeEmail(getEmailInput(container), 'other@test1.com');
+    expect(queryByRole('status')).toBeNull();
   });
 
   test('handles Error rejection and calls onError', async () => {

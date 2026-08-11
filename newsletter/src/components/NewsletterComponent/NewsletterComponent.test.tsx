@@ -2,14 +2,14 @@
  *  Copyright 2025 Adobe
  *  All Rights Reserved.
  *
- * NOTICE:  Adobe permits you to use, modify, and distribute this
+ * NOTICE:  Adobe permits you to use, copy, and distribute this
  * file in accordance with the terms of the Adobe license agreement
  * accompanying it.
  *******************************************************************/
 
 /** https://preactjs.com/guide/v10/preact-testing-library/ */
 
-import { act, fireEvent, render } from '@adobe-commerce/elsie/lib/tests';
+import { fireEvent, render } from '@adobe-commerce/elsie/lib/tests';
 import { NewsletterComponent } from '@/tfsnewsletterdropin/components/NewsletterComponent';
 
 const getEmailInput = (container: HTMLElement) =>
@@ -25,7 +25,7 @@ describe('TfsNewsletterDropin/Components/NewsletterComponent', () => {
     expect(getByRole('button').textContent).toContain('Subscribe');
   });
 
-  test('calls onSubmit with email', () => {
+  test('calls onSubmit with email from controlled prop', () => {
     const onSubmit = jest.fn();
     const { container } = render(
       <NewsletterComponent email="test1@test1.com" onSubmit={onSubmit} />
@@ -59,7 +59,15 @@ describe('TfsNewsletterDropin/Components/NewsletterComponent', () => {
     expect(getByRole('alert').textContent).toBe('Invalid email');
   });
 
-  test('calls onEmailChange when input changes', async () => {
+  test('shows success message', () => {
+    const { getByRole } = render(
+      <NewsletterComponent successMessage="Thanks for joining!" />
+    );
+
+    expect(getByRole('status').textContent).toBe('Thanks for joining!');
+  });
+
+  test('calls onEmailChange immediately when input changes', () => {
     const onEmailChange = jest.fn();
     const { container } = render(
       <NewsletterComponent onEmailChange={onEmailChange} />
@@ -67,10 +75,6 @@ describe('TfsNewsletterDropin/Components/NewsletterComponent', () => {
 
     fireEvent.change(getEmailInput(container), {
       target: { value: 'user@example.com' },
-    });
-
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 250));
     });
 
     expect(onEmailChange).toHaveBeenCalledWith('user@example.com');

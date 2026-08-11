@@ -35,11 +35,13 @@ export const NewsletterContainer: Container<NewsletterContainerProps> = ({
     submittingLabel: 'Newsletter.NewsletterContainer.submittingLabel',
     invalidEmail: 'Newsletter.NewsletterContainer.invalidEmail',
     requiredEmail: 'Newsletter.NewsletterContainer.requiredEmail',
+    successMessage: 'Newsletter.NewsletterContainer.successMessage',
   });
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const validateEmail = (value: string): string | null => {
     const trimmed = value.trim();
@@ -54,26 +56,32 @@ export const NewsletterContainer: Container<NewsletterContainerProps> = ({
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
-    if (emailError) {
-      setEmailError(null);
-    }
+    // Clear messages as soon as the user edits the field
+    setEmailError(null);
+    setSuccessMessage(null);
   };
 
   const handleSubmit = async (value: string) => {
     const validationError = validateEmail(value);
     if (validationError) {
       setEmailError(validationError);
+      setSuccessMessage(null);
       return;
     }
 
     const trimmedEmail = value.trim();
     setLoading(true);
     setEmailError(null);
+    setSuccessMessage(null);
 
     try {
       const result = await subscribeToNewsletter(trimmedEmail);
 
       setEmail('');
+      setSuccessMessage(
+        labels.successMessage ||
+          'Thank you for your subscription.'
+      );
 
       const payload = { email: trimmedEmail, status: result.status };
       events.emit('newsletter/subscribed', payload);
@@ -83,6 +91,7 @@ export const NewsletterContainer: Container<NewsletterContainerProps> = ({
         error instanceof Error ? error.message : 'Subscription failed';
 
       setEmailError(message);
+      setSuccessMessage(null);
 
       const payload = { email: trimmedEmail, message };
       events.emit('newsletter/error', payload);
@@ -101,6 +110,7 @@ export const NewsletterContainer: Container<NewsletterContainerProps> = ({
         email={email}
         loading={loading}
         emailError={emailError}
+        successMessage={successMessage}
         onEmailChange={handleEmailChange}
         onSubmit={handleSubmit}
       />
