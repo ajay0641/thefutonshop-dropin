@@ -40,6 +40,13 @@ export interface ProductSliderContainerProps
   ) => void;
   onProductImageClick?: (product: ProductSliderItem) => void;
   onProductNameClick?: (product: ProductSliderItem) => void;
+  /**
+   * Add-to-cart UI hook only (no cart GraphQL in this drop-in).
+   * Storefront should call:
+   *   addProductsToCart([{ sku: product.sku, quantity: 1 }])
+   * from `@dropins/storefront-cart`.
+   */
+  onAddToCart?: (product: ProductSliderItem) => void;
 }
 
 export const ProductSliderContainer: Container<ProductSliderContainerProps> = ({
@@ -54,6 +61,7 @@ export const ProductSliderContainer: Container<ProductSliderContainerProps> = ({
   onProductClick,
   onProductImageClick,
   onProductNameClick,
+  onAddToCart,
   ...props
 }) => {
   const labels = useText({
@@ -66,6 +74,7 @@ export const ProductSliderContainer: Container<ProductSliderContainerProps> = ({
     saveLabel: 'ProductSlider.ProductSliderContainer.saveLabel',
     reviewsLabel: 'ProductSlider.ProductSliderContainer.reviewsLabel',
     reviewLabel: 'ProductSlider.ProductSliderContainer.reviewLabel',
+    addToCartLabel: 'ProductSlider.ProductSliderContainer.addToCartLabel',
   });
 
   const [products, setProducts] = useState<ProductSliderItem[]>([]);
@@ -145,6 +154,11 @@ export const ProductSliderContainer: Container<ProductSliderContainerProps> = ({
     onProductNameClick?.(product);
   };
 
+  const handleAddToCart = (product: ProductSliderItem) => {
+    events.emit('product-slider/add-to-cart', { product });
+    onAddToCart?.(product);
+  };
+
   return (
     <div {...props}>
       <ProductSliderComponent
@@ -159,9 +173,11 @@ export const ProductSliderContainer: Container<ProductSliderContainerProps> = ({
         saveLabel={labels.saveLabel || 'Save up to {percent}%'}
         reviewsLabel={labels.reviewsLabel || '{count} Reviews'}
         reviewLabel={labels.reviewLabel || '{count} Review'}
+        addToCartLabel={labels.addToCartLabel || 'Add to cart'}
         onProductClick={handleProductClick}
         onProductImageClick={handleProductImageClick}
         onProductNameClick={handleProductNameClick}
+        onAddToCart={onAddToCart ? handleAddToCart : undefined}
         aria-busy={loading}
         aria-label={title || labels.loadingLabel || 'Product slider'}
       />

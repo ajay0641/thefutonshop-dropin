@@ -30,6 +30,7 @@ export interface ProductSliderComponentProps extends HTMLAttributes<HTMLDivEleme
   saveLabel?: string;
   reviewsLabel?: string;
   reviewLabel?: string;
+  addToCartLabel?: string;
   skeletonCount?: number;
   onProductClick?: (
     product: ProductSliderItem,
@@ -37,6 +38,8 @@ export interface ProductSliderComponentProps extends HTMLAttributes<HTMLDivEleme
   ) => void;
   onProductImageClick?: (product: ProductSliderItem) => void;
   onProductNameClick?: (product: ProductSliderItem) => void;
+  /** UI hook only — storefront wires cart `addProductsToCart`. */
+  onAddToCart?: (product: ProductSliderItem) => void;
 }
 
 export const ProductSliderComponent: FunctionComponent<ProductSliderComponentProps> = ({
@@ -52,10 +55,12 @@ export const ProductSliderComponent: FunctionComponent<ProductSliderComponentPro
   saveLabel,
   reviewsLabel,
   reviewLabel,
+  addToCartLabel,
   skeletonCount = 4,
   onProductClick,
   onProductImageClick,
   onProductNameClick,
+  onAddToCart,
   ...props
 }) => {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -154,9 +159,11 @@ export const ProductSliderComponent: FunctionComponent<ProductSliderComponentPro
                     saveLabel={saveLabel}
                     reviewsLabel={reviewsLabel}
                     reviewLabel={reviewLabel}
+                    addToCartLabel={addToCartLabel}
                     onProductClick={onProductClick}
                     onProductImageClick={onProductImageClick}
                     onProductNameClick={onProductNameClick}
+                    onAddToCart={onAddToCart}
                   />
                 </div>
               ))}

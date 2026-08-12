@@ -32,6 +32,10 @@ export const Default: Story = {
   args: {
     title: 'New Arrivals',
     products: sandboxProducts,
+    onAddToCart: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToCart', product.sku);
+    },
   },
 };
 

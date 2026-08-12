@@ -121,4 +121,34 @@ describe('TfsProductSlider/Components/ProductCard', () => {
     expect(onProductClick).not.toHaveBeenCalled();
     expect(getAllByRole('link')).toHaveLength(2);
   });
+
+  test('does not render ATC when onAddToCart is missing', () => {
+    const { queryByLabelText } = render(<ProductCard product={fullProduct} />);
+    expect(queryByLabelText('Add to cart')).toBeNull();
+  });
+
+  test('invokes onAddToCart from ATC button', () => {
+    const onAddToCart = jest.fn();
+    const { getByLabelText } = render(
+      <ProductCard product={fullProduct} onAddToCart={onAddToCart} />
+    );
+
+    fireEvent.click(getByLabelText('Add to cart'));
+    expect(onAddToCart).toHaveBeenCalledWith(fullProduct);
+  });
+
+  test('does not call onAddToCart when addToCartAllowed is false', () => {
+    const onAddToCart = jest.fn();
+    const { getByLabelText } = render(
+      <ProductCard
+        product={{ ...fullProduct, addToCartAllowed: false }}
+        onAddToCart={onAddToCart}
+      />
+    );
+
+    const button = getByLabelText('Add to cart') as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    fireEvent.click(button);
+    expect(onAddToCart).not.toHaveBeenCalled();
+  });
 });

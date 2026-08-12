@@ -85,6 +85,14 @@
         );
       });
 
+      events.on('product-slider/add-to-cart', (payload) => {
+        $data.innerText = JSON.stringify(
+          { event: 'product-slider/add-to-cart', payload },
+          null,
+          2
+        );
+      });
+
       $action_1.addEventListener('click', async () => {
         $data.innerText = '⏳ Fetching products…';
         try {
@@ -120,6 +128,19 @@
         },
         onError: (payload) => {
           console.error('Product slider error', payload);
+        },
+        // Drop-in UI hook only — storefront wires real cart mutation
+        onAddToCart: (product) => {
+          console.log('onAddToCart (sandbox mock)', product.sku);
+          $data.innerText = JSON.stringify(
+            {
+              hook: 'onAddToCart',
+              note: 'Storefront should call addProductsToCart here',
+              product,
+            },
+            null,
+            2
+          );
         },
       })(document.getElementById('my-container'));
 
