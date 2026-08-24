@@ -12,6 +12,7 @@ import { HTMLAttributes } from 'preact/compat';
 import { classes } from '@adobe-commerce/elsie/lib';
 import type { ProductSliderItem } from '@/tfsproductslider/data/models';
 import { CartIcon } from '@/tfsproductslider/components/ProductCard/CartIcon';
+import { WishlistIcon } from '@/tfsproductslider/components/ProductCard/WishlistIcon';
 import '@/tfsproductslider/components/ProductCard/ProductCard.css';
 
 export type ProductClickTarget = 'image' | 'name';
@@ -23,6 +24,7 @@ export interface ProductCardProps extends HTMLAttributes<HTMLDivElement> {
   reviewsLabel?: string;
   reviewLabel?: string;
   addToCartLabel?: string;
+  addToWishlistLabel?: string;
   /** Fires for image or name click (with which target was used). */
   onProductClick?: (
     product: ProductSliderItem,
@@ -37,6 +39,11 @@ export interface ProductCardProps extends HTMLAttributes<HTMLDivElement> {
    * Storefront should call `addProductsToCart` from `@dropins/storefront-cart`.
    */
   onAddToCart?: (product: ProductSliderItem) => void;
+  /**
+   * Add-to-wishlist UI hook only — drop-in does not call wishlist GraphQL.
+   * Storefront should wire `@dropins/storefront-wishlist` (or equivalent).
+   */
+  onAddToWishlist?: (product: ProductSliderItem) => void;
 }
 
 function formatMoney(value: number, currency = 'USD'): string {
@@ -76,10 +83,12 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
   reviewsLabel = '{count} Reviews',
   reviewLabel = '{count} Review',
   addToCartLabel = 'Add to cart',
+  addToWishlistLabel = 'Add to wish list',
   onProductClick,
   onProductImageClick,
   onProductNameClick,
   onAddToCart,
+  onAddToWishlist,
   className,
   ...props
 }) => {
@@ -107,6 +116,7 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
   const showReviews = typeof reviewCount === 'number' && reviewCount > 0;
   const showRating = typeof rating === 'number' && rating > 0;
   const showAddToCart = typeof onAddToCart === 'function';
+  const showAddToWishlist = typeof onAddToWishlist === 'function';
   const atcDisabled = addToCartAllowed === false;
 
   const reviewsText =
@@ -129,6 +139,12 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
     event.stopPropagation();
     if (atcDisabled) return;
     onAddToCart?.(product);
+  };
+
+  const handleAddToWishlist = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onAddToWishlist?.(product);
   };
 
   return (
@@ -162,16 +178,31 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
           </div>
         </a>
 
-        {showAddToCart && (
-          <button
-            type="button"
-            className="tfsproductslider-product-card__atc"
-            aria-label={addToCartLabel}
-            disabled={atcDisabled}
-            onClick={handleAddToCart}
-          >
-            <CartIcon className="tfsproductslider-product-card__atc-icon" />
-          </button>
+        {(showAddToCart || showAddToWishlist) && (
+          <div className="tfsproductslider-product-card__actions">
+            {showAddToCart && (
+              <button
+                type="button"
+                className="tfsproductslider-product-card__action-btn tfsproductslider-product-card__atc"
+                aria-label={addToCartLabel}
+                disabled={atcDisabled}
+                onClick={handleAddToCart}
+              >
+                <CartIcon className="tfsproductslider-product-card__action-btn-icon" />
+              </button>
+            )}
+
+            {showAddToWishlist && (
+              <button
+                type="button"
+                className="tfsproductslider-product-card__action-btn tfsproductslider-product-card__wishlist"
+                aria-label={addToWishlistLabel}
+                onClick={handleAddToWishlist}
+              >
+                <WishlistIcon className="tfsproductslider-product-card__action-btn-icon" />
+              </button>
+            )}
+          </div>
         )}
       </div>
 

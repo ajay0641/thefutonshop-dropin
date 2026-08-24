@@ -42,6 +42,10 @@ export const FromAltairSandboxResponse: Story = {
       // eslint-disable-next-line no-console
       console.log('onAddToCart', product.sku);
     },
+    onAddToWishlist: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToWishlist', product.sku);
+    },
   },
 };
 
@@ -55,6 +59,10 @@ export const StaticItems: Story = {
     onAddToCart: (product) => {
       // eslint-disable-next-line no-console
       console.log('onAddToCart', product.sku);
+    },
+    onAddToWishlist: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToWishlist', product.sku);
     },
   },
 };

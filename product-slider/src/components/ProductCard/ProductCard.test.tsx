@@ -127,6 +127,11 @@ describe('TfsProductSlider/Components/ProductCard', () => {
     expect(queryByLabelText('Add to cart')).toBeNull();
   });
 
+  test('does not render wishlist when onAddToWishlist is missing', () => {
+    const { queryByLabelText } = render(<ProductCard product={fullProduct} />);
+    expect(queryByLabelText('Add to wish list')).toBeNull();
+  });
+
   test('invokes onAddToCart from ATC button', () => {
     const onAddToCart = jest.fn();
     const { getByLabelText } = render(
@@ -150,5 +155,15 @@ describe('TfsProductSlider/Components/ProductCard', () => {
     expect(button.disabled).toBe(true);
     fireEvent.click(button);
     expect(onAddToCart).not.toHaveBeenCalled();
+  });
+
+  test('invokes onAddToWishlist from wishlist button', () => {
+    const onAddToWishlist = jest.fn();
+    const { getByLabelText } = render(
+      <ProductCard product={fullProduct} onAddToWishlist={onAddToWishlist} />
+    );
+
+    fireEvent.click(getByLabelText('Add to wish list'));
+    expect(onAddToWishlist).toHaveBeenCalledWith(fullProduct);
   });
 });

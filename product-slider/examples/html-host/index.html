@@ -142,6 +142,18 @@
             2
           );
         },
+        onAddToWishlist: (product) => {
+          console.log('onAddToWishlist (sandbox mock)', product.sku);
+          $data.innerText = JSON.stringify(
+            {
+              hook: 'onAddToWishlist',
+              note: 'Storefront should wire wishlist mutation here',
+              product,
+            },
+            null,
+            2
+          );
+        },
       })(document.getElementById('my-container'));
 
       $data.innerText = 'Ready — container loads products automatically.';

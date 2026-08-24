@@ -186,4 +186,32 @@ describe('TfsProductSlider/Containers/ProductSliderContainer', () => {
     fireEvent.click(getByLabelText('Add to cart'));
     expect(onAddToCart).toHaveBeenCalledWith(product);
   });
+
+  test('invokes onAddToWishlist from wishlist button', async () => {
+    const product = {
+      sku: 'WISH-1',
+      name: 'Wishlist Product',
+      url: '/p/wish-1',
+      imageUrl: 'https://example.com/wish.jpg',
+    };
+    mockFetchProducts.mockResolvedValue({
+      totalCount: 1,
+      items: [product],
+    });
+    const onAddToWishlist = jest.fn();
+
+    const { getByLabelText, getByText } = render(
+      <ProductSliderContainer
+        fetchProducts={mockFetchProducts}
+        onAddToWishlist={onAddToWishlist}
+      />
+    );
+
+    await waitFor(() => {
+      expect(getByText('Wishlist Product')).toBeTruthy();
+    });
+
+    fireEvent.click(getByLabelText('Add to wish list'));
+    expect(onAddToWishlist).toHaveBeenCalledWith(product);
+  });
 });
