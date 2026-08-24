@@ -38,6 +38,14 @@ export const FromAltairSandboxResponse: Story = {
     title: 'New Arrivals',
     fetchProducts: async () =>
       transformProductSearch(sandboxProductSearchResponse),
+    onAddToCart: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToCart', product.sku);
+    },
+    onAddToWishlist: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToWishlist', product.sku);
+    },
   },
 };
 
@@ -48,5 +56,13 @@ export const StaticItems: Story = {
       totalCount: sandboxProducts.length,
       items: sandboxProducts,
     }),
+    onAddToCart: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToCart', product.sku);
+    },
+    onAddToWishlist: (product) => {
+      // eslint-disable-next-line no-console
+      console.log('onAddToWishlist', product.sku);
+    },
   },
 };

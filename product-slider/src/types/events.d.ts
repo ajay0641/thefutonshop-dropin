@@ -14,5 +14,8 @@ declare module '@adobe-commerce/event-bus' {
       product: ProductSliderItem;
       target: 'image' | 'name';
     };
+    'product-slider/add-to-cart': {
+      product: ProductSliderItem;
+    };
   }
 }

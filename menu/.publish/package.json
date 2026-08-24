@@ -1,0 +1,10 @@
+{
+  "name": "@ajay0641/tfs-menu",
+  "version": "1.0.0",
+  "description": "The Futon Shop navigation menu drop-in for Adobe Commerce storefronts",
+  "license": "MIT",
+  "engines": {
+    "node": "^20.0.0 || ^22.0.0"
+  },
+  "sideEffects": false
+}

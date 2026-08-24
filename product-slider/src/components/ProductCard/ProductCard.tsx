@@ -11,6 +11,8 @@ import { FunctionComponent } from 'preact';
 import { HTMLAttributes } from 'preact/compat';
 import { classes } from '@adobe-commerce/elsie/lib';
 import type { ProductSliderItem } from '@/tfsproductslider/data/models';
+import { CartIcon } from '@/tfsproductslider/components/ProductCard/CartIcon';
+import { WishlistIcon } from '@/tfsproductslider/components/ProductCard/WishlistIcon';
 import '@/tfsproductslider/components/ProductCard/ProductCard.css';
 
 export type ProductClickTarget = 'image' | 'name';
@@ -21,6 +23,8 @@ export interface ProductCardProps extends HTMLAttributes<HTMLDivElement> {
   saveLabel?: string;
   reviewsLabel?: string;
   reviewLabel?: string;
+  addToCartLabel?: string;
+  addToWishlistLabel?: string;
   /** Fires for image or name click (with which target was used). */
   onProductClick?: (
     product: ProductSliderItem,
@@ -30,6 +34,16 @@ export interface ProductCardProps extends HTMLAttributes<HTMLDivElement> {
   onProductImageClick?: (product: ProductSliderItem) => void;
   /** Name-only click (also receives `onProductClick` with target "name"). */
   onProductNameClick?: (product: ProductSliderItem) => void;
+  /**
+   * Add-to-cart UI hook only — drop-in does not call cart GraphQL.
+   * Storefront should call `addProductsToCart` from `@dropins/storefront-cart`.
+   */
+  onAddToCart?: (product: ProductSliderItem) => void;
+  /**
+   * Add-to-wishlist UI hook only — drop-in does not call wishlist GraphQL.
+   * Storefront should wire `@dropins/storefront-wishlist` (or equivalent).
+   */
+  onAddToWishlist?: (product: ProductSliderItem) => void;
 }
 
 function formatMoney(value: number, currency = 'USD'): string {
@@ -68,9 +82,13 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
   saveLabel = 'Save up to {percent}%',
   reviewsLabel = '{count} Reviews',
   reviewLabel = '{count} Review',
+  addToCartLabel = 'Add to cart',
+  addToWishlistLabel = 'Add to wish list',
   onProductClick,
   onProductImageClick,
   onProductNameClick,
+  onAddToCart,
+  onAddToWishlist,
   className,
   ...props
 }) => {
@@ -86,6 +104,7 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
     savePercent,
     rating,
     reviewCount,
+    addToCartAllowed,
   } = product;
 
   const showPricing = typeof finalPrice === 'number';
@@ -96,6 +115,9 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
   const showSave = typeof savePercent === 'number' && savePercent > 0;
   const showReviews = typeof reviewCount === 'number' && reviewCount > 0;
   const showRating = typeof rating === 'number' && rating > 0;
+  const showAddToCart = typeof onAddToCart === 'function';
+  const showAddToWishlist = typeof onAddToWishlist === 'function';
+  const atcDisabled = addToCartAllowed === false;
 
   const reviewsText =
     reviewCount === 1
@@ -112,35 +134,77 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
     onProductClick?.(product, 'name');
   };
 
+  const handleAddToCart = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (atcDisabled) return;
+    onAddToCart?.(product);
+  };
+
+  const handleAddToWishlist = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onAddToWishlist?.(product);
+  };
+
   return (
     <div
       {...props}
       className={classes(['tfsproductslider-product-card', className])}
     >
-      <a
-        className="tfsproductslider-product-card__media-link"
-        href={url}
-        onClick={handleImageClick}
-        aria-label={name}
-      >
-        <div className="tfsproductslider-product-card__media">
-          {imageUrl ? (
-            <img
-              className="tfsproductslider-product-card__image"
-              src={imageUrl}
-              alt={imageLabel || name}
-              loading="lazy"
-              width={480}
-              height={480}
-            />
-          ) : (
-            <div
-              className="tfsproductslider-product-card__image tfsproductslider-product-card__image--placeholder"
-              aria-hidden="true"
-            />
-          )}
-        </div>
-      </a>
+      <div className="tfsproductslider-product-card__media-wrap">
+        <a
+          className="tfsproductslider-product-card__media-link"
+          href={url}
+          onClick={handleImageClick}
+          aria-label={name}
+        >
+          <div className="tfsproductslider-product-card__media">
+            {imageUrl ? (
+              <img
+                className="tfsproductslider-product-card__image"
+                src={imageUrl}
+                alt={imageLabel || name}
+                loading="lazy"
+                width={480}
+                height={480}
+              />
+            ) : (
+              <div
+                className="tfsproductslider-product-card__image tfsproductslider-product-card__image--placeholder"
+                aria-hidden="true"
+              />
+            )}
+          </div>
+        </a>
+
+        {(showAddToCart || showAddToWishlist) && (
+          <div className="tfsproductslider-product-card__actions">
+            {showAddToCart && (
+              <button
+                type="button"
+                className="tfsproductslider-product-card__action-btn tfsproductslider-product-card__atc"
+                aria-label={addToCartLabel}
+                disabled={atcDisabled}
+                onClick={handleAddToCart}
+              >
+                <CartIcon className="tfsproductslider-product-card__action-btn-icon" />
+              </button>
+            )}
+
+            {showAddToWishlist && (
+              <button
+                type="button"
+                className="tfsproductslider-product-card__action-btn tfsproductslider-product-card__wishlist"
+                aria-label={addToWishlistLabel}
+                onClick={handleAddToWishlist}
+              >
+                <WishlistIcon className="tfsproductslider-product-card__action-btn-icon" />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="tfsproductslider-product-card__body">
         <h3 className="tfsproductslider-product-card__title">

@@ -157,4 +157,61 @@ describe('TfsProductSlider/Containers/ProductSliderContainer', () => {
     expect(onProductImageClick).toHaveBeenCalledWith(product);
     expect(onProductClick).toHaveBeenCalledWith(product, 'image');
   });
+
+  test('invokes onAddToCart from ATC button', async () => {
+    const product = {
+      sku: 'ATC-1',
+      name: 'Addable Product',
+      url: '/p/atc-1',
+      imageUrl: 'https://example.com/atc.jpg',
+      addToCartAllowed: true,
+    };
+    mockFetchProducts.mockResolvedValue({
+      totalCount: 1,
+      items: [product],
+    });
+    const onAddToCart = jest.fn();
+
+    const { getByLabelText, getByText } = render(
+      <ProductSliderContainer
+        fetchProducts={mockFetchProducts}
+        onAddToCart={onAddToCart}
+      />
+    );
+
+    await waitFor(() => {
+      expect(getByText('Addable Product')).toBeTruthy();
+    });
+
+    fireEvent.click(getByLabelText('Add to cart'));
+    expect(onAddToCart).toHaveBeenCalledWith(product);
+  });
+
+  test('invokes onAddToWishlist from wishlist button', async () => {
+    const product = {
+      sku: 'WISH-1',
+      name: 'Wishlist Product',
+      url: '/p/wish-1',
+      imageUrl: 'https://example.com/wish.jpg',
+    };
+    mockFetchProducts.mockResolvedValue({
+      totalCount: 1,
+      items: [product],
+    });
+    const onAddToWishlist = jest.fn();
+
+    const { getByLabelText, getByText } = render(
+      <ProductSliderContainer
+        fetchProducts={mockFetchProducts}
+        onAddToWishlist={onAddToWishlist}
+      />
+    );
+
+    await waitFor(() => {
+      expect(getByText('Wishlist Product')).toBeTruthy();
+    });
+
+    fireEvent.click(getByLabelText('Add to wish list'));
+    expect(onAddToWishlist).toHaveBeenCalledWith(product);
+  });
 });
